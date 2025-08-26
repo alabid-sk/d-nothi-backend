@@ -1,22 +1,24 @@
-// Temporary in-memory dropdowns
-let dropdowns = {
-  source: [],
-  category: [],
-  service: [],
-  office: []
+const pool = require('../db');
+
+exports.getDropdowns = async (req, res) => {
+  try {
+    const { type } = req.params;
+    const result = await pool.query('SELECT * FROM dropdowns WHERE type=$1', [type]);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-const getDropdowns = (req, res) => {
-  const { type } = req.params;
-  if (!dropdowns[type]) return res.status(400).json({ message: 'Invalid dropdown type' });
-  res.json(dropdowns[type]);
+exports.addDropdown = async (req, res) => {
+  try {
+    const { type, value } = req.body;
+    const result = await pool.query(
+      'INSERT INTO dropdowns (type, value) VALUES ($1,$2) RETURNING *',
+      [type, value]
+    );
+    res.json({ message: 'Dropdown added', dropdown: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
-
-const addDropdown = (req, res) => {
-  const { type, value } = req.body;
-  if (!dropdowns[type]) return res.status(400).json({ message: 'Invalid dropdown type' });
-  dropdowns[type].push(value);
-  res.json({ message: 'Dropdown value added', type, values: dropdowns[type] });
-};
-
-module.exports = { getDropdowns, addDropdown };
