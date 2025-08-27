@@ -3,8 +3,8 @@ const pool = require('../db');
 exports.getDropdowns = async (req, res) => {
   try {
     const { type } = req.params;
-    const result = await pool.query('SELECT * FROM dropdowns WHERE type=$1', [type]);
-    res.json(result.rows);
+    const { rows } = await pool.query('SELECT * FROM dropdowns WHERE type=$1', [type]);
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -12,12 +12,12 @@ exports.getDropdowns = async (req, res) => {
 
 exports.addDropdown = async (req, res) => {
   try {
-    const { type, value } = req.body;
-    const result = await pool.query(
-      'INSERT INTO dropdowns (type, value) VALUES ($1,$2) RETURNING *',
-      [type, value]
+    const { type, value, parent_id } = req.body;
+    const { rows } = await pool.query(
+      `INSERT INTO dropdowns(type,value,parent_id) VALUES($1,$2,$3) RETURNING *`,
+      [type,value,parent_id || null]
     );
-    res.json({ message: 'Dropdown added', dropdown: result.rows[0] });
+    res.json(rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
