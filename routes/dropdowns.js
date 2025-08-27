@@ -1,11 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { getDropdowns, addDropdown } = require('../controllers/dropdownController');
+const { getDropdowns, addDropdown } = require("../controllers/dropdownController");
+const auth = require("../middleware/authMiddleware");
 
-// Get dropdowns by type
-router.get('/:type', getDropdowns);
-
-// Add new dropdown value
-router.post('/', addDropdown);
+router.get("/:type", auth(), getDropdowns);
+router.post("/", auth(["admin","supervisor"]), addDropdown);
 
 module.exports = router;

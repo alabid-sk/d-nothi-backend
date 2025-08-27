@@ -1,11 +1,11 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { getLeaves, requestLeave } = require('../controllers/leaveController');
+const { getLeaves, requestLeave, updateLeave } = require("../controllers/leaveController");
+const auth = require("../middleware/authMiddleware");
 
-// Get leave requests
-router.get('/', getLeaves);
-
-// Request leave
-router.post('/', requestLeave);
+router.get("/", auth(["admin","supervisor"]), getLeaves);
+router.get("/self", auth(), getLeaves);
+router.post("/", auth(), requestLeave);
+router.put("/:id", auth(["admin","supervisor"]), updateLeave);
 
 module.exports = router;

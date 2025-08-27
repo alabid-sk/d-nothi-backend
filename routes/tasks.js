@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { authMiddleware } = require("../controllers/authController");
-const { createTask, getTasks } = require("../controllers/taskController");
+const { getTasks, createTask } = require("../controllers/taskController");
+const auth = require("../middleware/authMiddleware");
 
-router.get("/", authMiddleware(["admin","supervisor"]), getTasks);
-router.get("/self", authMiddleware(["agent"]), getTasks);
-router.post("/", authMiddleware(["admin","supervisor","agent"]), createTask);
+router.get("/", auth(["admin","supervisor"]), getTasks);
+router.get("/self", auth(["agent","supervisor","admin"]), getTasks);
+router.post("/", auth(), createTask);
 
 module.exports = router;
